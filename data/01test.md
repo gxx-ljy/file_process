@@ -1,0 +1,2 @@
+这是一个txt测试文件
+happy ending
