@@ -1,3 +1,5 @@
+# https://pymupdf.readthedocs.io/en/latest/textpage.html#TextPage.extractDICT
+
 def extract_tables_from_pdf(pdf_path):
     import fitz  # PyMuPDF
     import pandas as pd
