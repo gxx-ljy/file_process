@@ -33,3 +33,57 @@ def extract_images_from_pdf(pdf_path):
     
             pix.save("page_%s-image_%s.png" % (page_index, image_index)) # save the image as png
             pix = None
+
+
+
+
+def split_pdf_vertically(doc, n1=0, n2=0, start_page=15, end_page=None):
+    """
+    根据页面高度裁剪页眉和页脚
+    将PDF文档垂直分割成多个部分。
+    左上角是坐标原点
+
+    参数:
+    doc: 输入的PDF文档对象。
+    n1: 顶部裁剪的高度，默认为0像素。
+    n2: 底部裁剪的高度，默认为0像素。
+    start_page: 开始裁剪的页码，默认从第15页开始。
+    end_page: 结束裁剪的页码，默认为None，表示裁剪到文档末尾。
+
+    返回:
+    一个新的PDF文档对象，其中包含了裁剪后的页面。
+    """
+    import fitz
+
+    # 获取输入文档的总页数
+    total_pages = doc.page_count
+    
+    # 打开一个新的PDF文档，用于存放裁剪后的页面
+    new_doc = fitz.open()
+
+    # 遍历输入文档的每一页
+    for page in doc:
+        # 获取当前页面的宽度和高度
+        width = page.rect.width
+        height = page.rect.height
+
+        # 如果没有指定结束页码，则将结束页码设置为总页数
+        if not end_page or end_page > total_pages:
+            end_page = total_pages
+        
+        # 检查当前页面是否在裁剪的页码范围内
+        if start_page - 1 <= page.number < end_page:
+            # 创建一个新的页面，高度为原页面高度减去裁剪的高度
+            new_page = new_doc.new_page(width=width, height=height - n1 - n2)
+            # 在新页面上显示裁剪后的原页面内容
+            new_page.show_pdf_page(new_page.rect, doc, page.number, clip=fitz.Rect(0, n1, width, height - n2))
+        else:
+            # 如果当前页面不在裁剪范围内，跳过此页面
+            continue
+
+    # 返回包含裁剪后页面的新PDF文档
+    # return new_doc
+    if False:
+        output_pdf = "test.pdf"
+        new_doc.save(output_pdf)
+    return new_doc
